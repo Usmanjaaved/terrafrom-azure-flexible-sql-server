@@ -1,0 +1,27 @@
+This module is for Azure Fs myql server. 
+
+expample root main.tf looks like this...
+
+
+module "mysql" {
+  source               = "./modules/mysql"
+  db_version           = var.db_version
+  server_name          = "devteam24-fs"
+  resource_group_name  = module.azurerm_resource_group.resource_group_name
+  location             = module.azurerm_resource_group.resource_group_location
+  db_login             = var.db_login
+  db_password          = module.key_vault_secret.secret_value
+  backup_retention_days = 7
+  delegated_subnet_id  = module.sql_subnet.subnet_id 
+  sku_name             = "B_Standard_B1s"
+  depends_on           = [module.key_vault_secret, module.vnet_link, module.private_dns_zone]
+  config_name          = "require_secure_transport"
+  config_value         = "OFF"
+  database_name        = "devteam24"
+  charset              = "utf8"
+  collation            = "utf8_unicode_ci"
+  private_dns_zone_id  = module.private_dns_zone.id
+}
+
+
+Note: We need to create subnet and virtual link with for this server
